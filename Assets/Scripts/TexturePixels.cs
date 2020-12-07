@@ -5,12 +5,15 @@ using UnityEngine;
 public class TexturePixels : MonoBehaviour
 {
     private Color[] colorArray = new Color[16];
-    private int imageHeight = 256;
-    private int imageWidth = 256;
+    public int imageHeight = 256;
+    public int imageWidth = 256;
     private float minReal = -2.0f;
     private float maxReal = 1.0f;
     private float minIm = -1.2f;
     private float maxIm;
+
+    public int maxIterations = 1000;
+    private int maxColor = 255 * 255 * 255;
 
     // Start is called before the first frame update
     void Start()
@@ -19,9 +22,10 @@ public class TexturePixels : MonoBehaviour
         float realFactor = (maxReal - minReal) / (imageWidth - 1);
         float imFactor = (maxIm - minIm) / (imageHeight - 1);
 
-        Texture2D texture = new Texture2D(imageHeight, imageWidth);
+        Texture2D texture = new Texture2D(imageHeight, imageWidth, TextureFormat.RGBA32,false);
         GetComponent<Renderer>().material.mainTexture = texture;
 
+        int colorDivisions = maxColor / maxIterations;
 
         colorArray[0] = new Color(0.25f, 0.12f, 0.06f);
         colorArray[1] = new Color(0.10f, 0.03f, 0.10f);
@@ -58,22 +62,30 @@ public class TexturePixels : MonoBehaviour
                 float x = 0;
                 float y = 0;
                 int iteration = 0;
-                int max_iterations = 1000;
 
                 float xC = minReal + x0 * realFactor;
                 float yC = maxIm - y0 * imFactor;
 
-                while (x * x + y * y <= 2 * 2 && iteration < max_iterations)
+                while (x * x + y * y <= 2 * 2 && iteration < maxIterations)
                 {
                     float xTemp = x * x - y * y + xC;
                     y = 2 * x * y + yC;
                     x = xTemp;
                     iteration++;
                 }
-                if (iteration < max_iterations && iteration > 0)
+                if (iteration < maxIterations && iteration > 0)
                 {
-                    int i = iteration % 16;
-                    texture.SetPixel(x0, y0, colorArray[i]);
+                    int colorInt = iteration * colorDivisions;
+                    Color32 color = new Color32
+                    {
+                        b = (byte)((colorInt & 0xFF)),
+                        g = (byte)((colorInt >> 8 & 0xFF)),
+                        r = (byte)((colorInt >> 16 & 0xFF)),
+                        a = 1//(byte)((colorInt >> 24 & 0xFF))
+                    };
+                    //int i = iteration % 16;
+                    texture.SetPixel(x0, y0, color);
+                    //Debug.Log(color.ToString());
                 } else
                 {
                     texture.SetPixel(x0, y0, Color.black);
