@@ -328,8 +328,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3064f7e4df7e2964b8c22f4755cf1f54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imageHeight: 256
-  imageWidth: 256
+  imageHeight: 1000
+  imageWidth: 1000
   maxIterations: 1000
 --- !u!64 &1704933039
 MeshCollider:

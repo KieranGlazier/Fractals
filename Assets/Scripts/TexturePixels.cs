@@ -44,16 +44,6 @@ public class TexturePixels : MonoBehaviour
         colorArray[14] = new Color(0.60f, 0.34f, 0.00f);
         colorArray[15] = new Color(0.41f, 0.20f, 0.01f);
 
-        /*
-        for (int y  = 0; y < texture.height; y++)
-        {
-            for (int x = 0; x < texture.width; x++)
-            {
-                Color color = ((x & y) != 0 ? Color.white : Color.gray);
-                texture.SetPixel(x, y, color);
-            }
-        }
-        */
 
         for (int y0 = 0; y0 < texture.height; y0++)
         {
@@ -66,13 +56,19 @@ public class TexturePixels : MonoBehaviour
                 float xC = minReal + x0 * realFactor;
                 float yC = maxIm - y0 * imFactor;
 
-                while (x * x + y * y <= 2 * 2 && iteration < maxIterations)
+                float y2 = 0;
+                float x2 = 0;
+                                
+                while ((x2 + y2) <= 4 && iteration < maxIterations)
                 {
-                    float xTemp = x * x - y * y + xC;
                     y = 2 * x * y + yC;
-                    x = xTemp;
+                    x = x2 - y2 + xC;
+                    x2 = x * x;
+                    y2 = y * y;
                     iteration++;
                 }
+                
+                
                 if (iteration < maxIterations && iteration > 0)
                 {
                     int colorInt = iteration * colorDivisions;
@@ -83,8 +79,9 @@ public class TexturePixels : MonoBehaviour
                         r = (byte)((colorInt >> 16 & 0xFF)),
                         a = 1//(byte)((colorInt >> 24 & 0xFF))
                     };
-                    //int i = iteration % 16;
-                    texture.SetPixel(x0, y0, color);
+                    int i = iteration % 16;
+                    texture.SetPixel(x0, y0, colorArray[i]);
+                    //texture.SetPixel(x0, y0, color);
                     //Debug.Log(color.ToString());
                 } else
                 {
@@ -93,12 +90,7 @@ public class TexturePixels : MonoBehaviour
             }
         }
         texture.Apply();
-        /*
-        foreach (Color pixel in texture.GetPixels(0,0,128,128))
-        {
-            
-        }
-                */
+        
     }
 
     // Update is called once per frame
