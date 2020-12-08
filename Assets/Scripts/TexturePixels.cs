@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TexturePixels : MonoBehaviour
 {
-    private Color[] colorArray = new Color[16];
+    private Color[] colorArray = new Color[17];
     public int imageHeight = 256;
     public int imageWidth = 256;
     private float minReal = -2.0f;
@@ -43,6 +43,7 @@ public class TexturePixels : MonoBehaviour
         colorArray[13] = new Color(0.80f, 0.50f, 0.00f);
         colorArray[14] = new Color(0.60f, 0.34f, 0.00f);
         colorArray[15] = new Color(0.41f, 0.20f, 0.01f);
+        colorArray[16] = Color.black;
 
 
         for (int y0 = 0; y0 < texture.height; y0++)
@@ -67,9 +68,23 @@ public class TexturePixels : MonoBehaviour
                     y2 = y * y;
                     iteration++;
                 }
-                
-                
-                if (iteration < maxIterations && iteration > 0)
+
+                if (iteration < maxIterations)
+                {
+                    // sqrt of inner term removed using log simplification rules
+                    float logzn = Mathf.Log(x * x + y * y) / 2;
+                    float nu = Mathf.Log(logzn / Mathf.Log(2)) / Mathf.Log(2);
+                    float i = iteration % 16;
+                    i = i + 1 - nu;
+
+                    Color32 color1 = colorArray[(int) i];
+                    Color32 color2 = colorArray[(int) i + 1];
+                    Color32 color = Color.Lerp(color1, color2, i % 1);
+                    texture.SetPixel(x0, y0, color);
+                } else
+
+                /*
+                    if (iteration < maxIterations && iteration > 0)
                 {
                     int colorInt = iteration * colorDivisions;
                     Color32 color = new Color32
@@ -84,6 +99,7 @@ public class TexturePixels : MonoBehaviour
                     //texture.SetPixel(x0, y0, color);
                     //Debug.Log(color.ToString());
                 } else
+                */
                 {
                     texture.SetPixel(x0, y0, Color.black);
                 }
